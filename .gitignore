@@ -1,0 +1,17 @@
+# Build output
+target/
+*.class
+
+# Local credentials (never commit) -- copy the *.example files instead
+.env
+src/main/resources/db.properties
+src/test/resources/db.properties
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+*.log
+/db.properties
+logs/

@@ -1,0 +1,284 @@
+==============================================================
+ Bank Account and Transaction Management System (operator console)
+==============================================================
+
+=== Main Menu ===
+ 1. Customers
+ 2. Branches and products
+ 3. Accounts
+ 4. Transactions (deposit, withdraw, transfer, charge, reverse)
+ 5. Beneficiaries
+ 6. Loans
+ 7. Statements and reports
+ 0. Exit
+Choose: 
+=== Reports ===
+ 1. Account statement
+ 2. Account balances
+ 3. Transaction audit
+ 4. Transfers
+ 5. Loan outstanding
+ 6. Loan repayments
+ 7. Branch summary
+ 8. Trial balance (bank's books)
+ 9. Charge summary
+10. Daily transaction summary
+11. Ledger integrity check (invariants I1-I11)
+ 0. Back
+Choose: 
+== Account Balances (11 rows) ==
+account_number  primary_holder  holder_count  branch_name   type_code  status   balance       min_balance  opened_at
+--------------  --------------  ------------  ------------  ---------  -------  ------------  -----------  ----------------
+197071188826    Farhan Qureshi             1  Andheri West  CURRENT    BLOCKED     59,500.00     2,000.00  2026-03-18 10:30
+492624600020    Priya Sharma               1  Andheri West  SALARY     ACTIVE     312,000.00         0.00  2026-04-02 10:30
+566727870507    Arjun Nair                 1  Andheri West  SAVINGS    ACTIVE     113,333.36       500.00  2026-03-12 10:30
+735237111862    Aarav Sharma               2  Andheri West  SAVINGS    ACTIVE     299,975.00       500.00  2026-03-02 10:30
+253132485105    Ananya Iyer                1  Koramangala   SALARY     ACTIVE     165,000.00         0.00  2026-03-06 10:30
+379150399839    Kavya Reddy                1  Koramangala   SALARY     ACTIVE     236,000.00         0.00  2026-03-16 10:30
+644485294453    Sneha Kulkarni             1  Koramangala   SAVINGS    ACTIVE     119,975.00       500.00  2026-03-10 10:30
+242945731257    Vikram Singh               1  Shivajinagar  CURRENT    FROZEN      60,000.00     2,000.00  2026-04-01 10:30
+341541697478    Vikram Singh               1  Shivajinagar  SAVINGS    ACTIVE      35,463.79       500.00  2026-03-09 10:30
+630872549179    Rohan Mehta                1  Shivajinagar  CURRENT    ACTIVE   3,156,850.00     2,000.00  2026-03-04 10:30
+803718252517    Meera Joshi                1  Shivajinagar  SAVINGS    CLOSED           0.00       500.00  2026-03-20 10:30
+
+=== Reports ===
+ 1. Account statement
+ 2. Account balances
+ 3. Transaction audit
+ 4. Transfers
+ 5. Loan outstanding
+ 6. Loan repayments
+ 7. Branch summary
+ 8. Trial balance (bank's books)
+ 9. Charge summary
+10. Daily transaction summary
+11. Ledger integrity check (invariants I1-I11)
+ 0. Back
+Choose: 
+=== Main Menu ===
+ 1. Customers
+ 2. Branches and products
+ 3. Accounts
+ 4. Transactions (deposit, withdraw, transfer, charge, reverse)
+ 5. Beneficiaries
+ 6. Loans
+ 7. Statements and reports
+ 0. Exit
+Choose: 
+=== Transactions ===
+ 1. Deposit
+ 2. Withdraw
+ 3. Transfer to own account
+ 4. Transfer to beneficiary
+ 5. Apply service charge
+ 6. Reverse a transaction
+ 7. Look up transaction by reference
+ 0. Back
+Choose: Account (12-digit account number): Amount: Narration:   OK: DEPOSIT posted: reference TX20261003PJJWBC, amount 500.00.
+
+== Transaction TX20261003PJJWBC (2 rows) ==
+reference_no      posted_at         transaction_type  transaction_status  account_number  entry_side  amount  balance_after  narration
+----------------  ----------------  ----------------  ------------------  --------------  ----------  ------  -------------  ---------------
+TX20261003PJJWBC  2026-10-03 12:31  DEPOSIT           POSTED              900000000001    DEBIT       500.00  51,935,500.00  Counter deposit
+TX20261003PJJWBC  2026-10-03 12:31  DEPOSIT           POSTED              253132485105    CREDIT      500.00     165,500.00  Counter deposit
+
+=== Transactions ===
+ 1. Deposit
+ 2. Withdraw
+ 3. Transfer to own account
+ 4. Transfer to beneficiary
+ 5. Apply service charge
+ 6. Reverse a transaction
+ 7. Look up transaction by reference
+ 0. Back
+Choose: Account (12-digit account number): Amount: Narration:   ERROR: Withdrawal amount must be greater than zero.
+
+=== Transactions ===
+ 1. Deposit
+ 2. Withdraw
+ 3. Transfer to own account
+ 4. Transfer to beneficiary
+ 5. Apply service charge
+ 6. Reverse a transaction
+ 7. Look up transaction by reference
+ 0. Back
+Choose: From account (12-digit account number): To account (12-digit account number): Amount: Remarks:   ERROR: Account 379150399839 belongs to a different customer: add it as a beneficiary first.
+
+=== Transactions ===
+ 1. Deposit
+ 2. Withdraw
+ 3. Transfer to own account
+ 4. Transfer to beneficiary
+ 5. Apply service charge
+ 6. Reverse a transaction
+ 7. Look up transaction by reference
+ 0. Back
+Choose: Account (12-digit account number): Amount: Narration:   ERROR: Account 197071188826 is BLOCKED and cannot be debited.
+
+=== Transactions ===
+ 1. Deposit
+ 2. Withdraw
+ 3. Transfer to own account
+ 4. Transfer to beneficiary
+ 5. Apply service charge
+ 6. Reverse a transaction
+ 7. Look up transaction by reference
+ 0. Back
+Choose: 
+=== Main Menu ===
+ 1. Customers
+ 2. Branches and products
+ 3. Accounts
+ 4. Transactions (deposit, withdraw, transfer, charge, reverse)
+ 5. Beneficiaries
+ 6. Loans
+ 7. Statements and reports
+ 0. Exit
+Choose: 
+=== Loans ===
+ 1. Disburse loan
+ 2. View loan and schedule
+ 3. Repay next instalment
+ 4. Loans of a customer
+ 5. Loan outstanding report
+ 6. Loan repayment report
+ 0. Back
+Choose: Loan number (LN...): loan            borrower    type      principal   rate_%  emi        paid  overdue  outstanding  next_due    status
+--------------  ----------  --------  ----------  ------  ---------  ----  -------  -----------  ----------  ------
+LN202604067127  Arjun Nair  PERSONAL  200,000.00   13.50  17,910.41  4/12        1   136,293.33  2026-09-06  ACTIVE
+no  due_date    principal  interest  amount     status   paid_ref          days_overdue
+--  ----------  ---------  --------  ---------  -------  ----------------  ------------
+ 1  2026-05-06  15,660.41  2,250.00  17,910.41  PAID     TX202605068X9RW5             0
+ 2  2026-06-06  15,836.59  2,073.82  17,910.41  PAID     TX202606065YYJA5             0
+ 3  2026-07-06  16,014.75  1,895.66  17,910.41  PAID     TX20260711G98E69             0
+ 4  2026-08-06  16,194.92  1,715.49  17,910.41  PAID     TX202608064QJ7GB             0
+ 5  2026-09-06  16,377.11  1,533.30  17,910.41  OVERDUE                              27
+ 6  2026-10-06  16,561.35  1,349.06  17,910.41  PENDING                               0
+ 7  2026-11-06  16,747.67  1,162.74  17,910.41  PENDING                               0
+ 8  2026-12-06  16,936.08    974.33  17,910.41  PENDING                               0
+ 9  2027-01-06  17,126.61    783.80  17,910.41  PENDING                               0
+10  2027-02-06  17,319.28    591.13  17,910.41  PENDING                               0
+11  2027-03-06  17,514.13    396.28  17,910.41  PENDING                               0
+12  2027-04-06  17,711.10    199.25  17,910.35  PENDING                               0
+
+=== Loans ===
+ 1. Disburse loan
+ 2. View loan and schedule
+ 3. Repay next instalment
+ 4. Loans of a customer
+ 5. Loan outstanding report
+ 6. Loan repayment report
+ 0. Back
+Choose: 
+=== Main Menu ===
+ 1. Customers
+ 2. Branches and products
+ 3. Accounts
+ 4. Transactions (deposit, withdraw, transfer, charge, reverse)
+ 5. Beneficiaries
+ 6. Loans
+ 7. Statements and reports
+ 0. Exit
+Choose: 
+=== Reports ===
+ 1. Account statement
+ 2. Account balances
+ 3. Transaction audit
+ 4. Transfers
+ 5. Loan outstanding
+ 6. Loan repayments
+ 7. Branch summary
+ 8. Trial balance (bank's books)
+ 9. Charge summary
+10. Daily transaction summary
+11. Ledger integrity check (invariants I1-I11)
+ 0. Back
+Choose: Account (12-digit account number): From [yyyy-mm-dd, blank = 2026-10-01]: To [yyyy-mm-dd, blank = 2026-10-03]: 
+ACCOUNT STATEMENT  253132485105  (Salary Account, Koramangala)
+Holder(s): Ananya Iyer   Status: ACTIVE
+Period: 2026-09-01 to 2026-09-30   Opening balance: 145,000.00
+date              reference         type        narration                              debit      credit     balance     note
+----------------  ----------------  ----------  -------------------------------------  ---------  ---------  ----------  ----
+2026-09-05 09:00  TX2026090599B3R4  TRANSFER    Transfer 253132485105 -> 644485294453  15,000.00             130,000.00
+2026-09-15 13:00  TX20260915L26TF8  WITHDRAWAL  ATM withdrawal                         10,000.00             120,000.00
+2026-09-30 18:00  TX202609307VRV2P  TRANSFER    Transfer 630872549179 -> 253132485105             45,000.00  165,000.00
+Total debits 25,000.00 | total credits 45,000.00 | closing balance 165,000.00  [opening + credits - debits = closing]
+
+=== Reports ===
+ 1. Account statement
+ 2. Account balances
+ 3. Transaction audit
+ 4. Transfers
+ 5. Loan outstanding
+ 6. Loan repayments
+ 7. Branch summary
+ 8. Trial balance (bank's books)
+ 9. Charge summary
+10. Daily transaction summary
+11. Ledger integrity check (invariants I1-I11)
+ 0. Back
+Choose: 
+== Trial Balance (6 rows) ==
+ledger_account     ledger_group                   normal_side  debit_balance  credit_balance
+-----------------  -----------------------------  -----------  -------------  --------------
+CASH               Internal Asset Account         DEBIT        51,935,500.00            0.00
+LOAN_RECEIVABLE    Internal Asset Account         DEBIT         2,636,293.33            0.00
+FEE_INCOME         Internal Income Account        CREDIT                0.00          750.00
+INTEREST_INCOME    Internal Income Account        CREDIT                0.00       12,446.18
+CAPITAL            Internal Equity Account        CREDIT                0.00   50,000,000.00
+CUSTOMER_DEPOSITS  Customer accounts (liability)  CREDIT                0.00    4,558,597.15
+
+=== Reports ===
+ 1. Account statement
+ 2. Account balances
+ 3. Transaction audit
+ 4. Transfers
+ 5. Loan outstanding
+ 6. Loan repayments
+ 7. Branch summary
+ 8. Trial balance (bank's books)
+ 9. Charge summary
+10. Daily transaction summary
+11. Ledger integrity check (invariants I1-I11)
+ 0. Back
+Choose: invariant                                 violations  result
+----------------------------------------  ----------  ------
+I1 transaction debits = credits, >= 2 e~           0  PASS
+I2 account balance = signed net of entr~           0  PASS
+I2b latest balance_after = account bala~           0  PASS
+I3 trial balance: debit-normal = credit~           0  PASS
+I5 reversed <-> exactly one reversal               0  PASS
+I6a loan schedule principal sums to loa~           0  PASS
+I6b total outstanding principal = LOAN_~           0  PASS
+I7a transfer = 1 debit + 1 credit on 2 ~           0  PASS
+I7b charge debits a customer account an~           0  PASS
+I8 repayment amount = scheduled instalm~           0  PASS
+I9 every customer account has exactly o~           0  PASS
+I10 holders within product max_holders             0  PASS
+I11 current status = latest status hist~           0  PASS
+  All ledger invariants hold.
+
+=== Reports ===
+ 1. Account statement
+ 2. Account balances
+ 3. Transaction audit
+ 4. Transfers
+ 5. Loan outstanding
+ 6. Loan repayments
+ 7. Branch summary
+ 8. Trial balance (bank's books)
+ 9. Charge summary
+10. Daily transaction summary
+11. Ledger integrity check (invariants I1-I11)
+ 0. Back
+Choose: 
+=== Main Menu ===
+ 1. Customers
+ 2. Branches and products
+ 3. Accounts
+ 4. Transactions (deposit, withdraw, transfer, charge, reverse)
+ 5. Beneficiaries
+ 6. Loans
+ 7. Statements and reports
+ 0. Exit
+Choose: Goodbye.

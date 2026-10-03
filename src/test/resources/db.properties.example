@@ -1,0 +1,9 @@
+# Copy to src/test/resources/db.properties (gitignored).
+# The tests DROP and re-create this database before each test class, so it must
+# be a dedicated test database whose name ends in _test.
+db.url=jdbc:mysql://localhost:3306/bank_dbms_test
+db.user=bank_app
+db.password=CHANGE_ME
+# Administrator account used only to rebuild the test schema (DDL + triggers).
+db.admin.user=root
+db.admin.password=

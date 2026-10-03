@@ -1,0 +1,6 @@
+# Copy to db.properties (project root, gitignored) and set the real password.
+# Lookup order used by the application: environment variables DB_URL / DB_USER /
+# DB_PASSWORD, then -Dbankdbms.config=<file>, then ./db.properties.
+db.url=jdbc:mysql://localhost:3306/bank_dbms
+db.user=bank_app
+db.password=CHANGE_ME
