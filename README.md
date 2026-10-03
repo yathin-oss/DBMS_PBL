@@ -142,3 +142,7 @@ The test database name must end in `_test`, and the suite refuses to rebuild any
 - **Loans:** exact-instalment repayment only (no partial or advance payment); loan transactions cannot be reversed.
 - **Concurrency:** all cash operations lock one CASH account, so they are serialised. That's fine for one operator; a real bank would use branch tills.
 - **Platform:** developed and tested on MySQL 26.7.0 on macOS. The SQL targets MySQL 8.0.16+, but older versions and Windows are not verified.
+
+## 7. License
+
+Released under the MIT License (see [LICENSE](LICENSE)).
