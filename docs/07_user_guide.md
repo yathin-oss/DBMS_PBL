@@ -1,10 +1,42 @@
-# 07 — User Guide (operator console)
+# 07 — User Guide
 
-Start the application with `java -jar target/bank-dbms.jar` after completing the README setup. The walkthrough below uses the sample data (`scripts/setup_database.sh --with-sample-data`).
+After completing the README setup, start the **desktop application** with `java -jar target/bank-dbms.jar`, or double-click the jar. The examples use the sample data (`scripts/setup_database.sh --with-sample-data`).
+
+## A. Desktop application
+
+The window has one tab per area. Selecting a tab reloads its data from the database. Problems (invalid input, insufficient funds, a blocked account...) appear in a dialog with a plain explanation, and nothing is saved.
+
+| Tab | What you can do |
+|---|---|
+| **Dashboard** | Headline figures (customers, deposits, loans outstanding, overdue instalments), the ledger integrity result, and the branch summary |
+| **Customers** | Search; register or edit a customer; see the selected customer's accounts |
+| **Accounts** | Search; open an account (customer, branch and product drop-downs); add a joint holder; change status; close (with payout). Selecting an account shows its holders and status history |
+| **Transactions** | Deposit, Withdraw, Transfer (own account or saved beneficiary), Service charge, Reverse / look up. After posting, the double-entry ledger lines are shown |
+| **Beneficiaries** | Pick a customer; add, rename, deactivate or reactivate saved payees |
+| **Loans** | Loan portfolio; select a loan to see its schedule (PAID / OVERDUE / PENDING); disburse a loan (with live EMI preview); repay the next instalment |
+| **Branches & products** | Branches (create, edit contact details) and account types (create products) |
+| **Statements & reports** | Account statement and every report; date range; Export CSV |
+
+![Dashboard](screenshots/1_dashboard.png)
+![Accounts](screenshots/3_accounts.png)
+![Deposit result](screenshots/4b_transactions_after_deposit.png)
+![Statement](screenshots/8b_statement.png)
+
+**A quick tour:**
+1. **Dashboard:** note 1 overdue instalment.
+2. **Loans:** select Arjun Nair's loan to see instalment 5 OVERDUE, then **Repay next instalment...**.
+3. **Transactions → Deposit:** pick Ananya Iyer's account, enter 500, click **Post deposit**.
+4. **Transactions → Withdraw:** pick Farhan Qureshi's (BLOCKED) account. The dialog explains it cannot be debited.
+5. **Statements & reports:** run **Account statement** for Ananya, 2026-09-01 to 2026-09-30. The footer confirms opening + credits − debits = closing.
+6. **Statements & reports → Ledger integrity check:** all 13 checks pass.
+
+## B. Console mode (optional)
+
+Start with `java -jar target/bank-dbms.jar --console`.
 
 Account and loan numbers are generated randomly. Look them up first with **Accounts → Search accounts** (type a holder name) or **Reports → Account balances**.
 
-## 1. Navigation
+### B.1 Navigation
 
 ```
 === Main Menu ===
@@ -24,7 +56,7 @@ Account and loan numbers are generated randomly. Look them up first with **Accou
 - **Dates:** use `yyyy-mm-dd`; blank accepts the default shown in brackets.
 - **Errors:** shown as `ERROR: <reason>`. Nothing is saved when an error is shown.
 
-## 2. A guided tour
+### B.2 A guided tour
 
 | Step | Menu path | What to enter | What you should see |
 |---|---|---|---|
@@ -44,7 +76,7 @@ Account and loan numbers are generated randomly. Look them up first with **Accou
 
 A recorded run of steps 1, 3, 4, 5, 7, 8, 10, 12 and 13 (against the final build) is in [evidence/console_session.txt](evidence/console_session.txt).
 
-## 3. Common tasks
+## C. Common tasks (both interfaces)
 
 **Open an account (3 → 1):**
 1. Register the customer first (1 → 1). The holder must be at least 18.
@@ -66,7 +98,7 @@ A recorded run of steps 1, 3, 4, 5, 7, 8, 10, 12 and 13 (against the final build
 - The rate must be above 0% and at most 36%; the tenure 1–360 months.
 - The EMI and schedule are generated immediately.
 
-## 4. Troubleshooting
+## D. Troubleshooting
 
 | Message | Cause / fix |
 |---|---|

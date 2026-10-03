@@ -2,7 +2,7 @@
 
 **DBMS Project 55: Design and Implementation of a Database Management System for Bank Account and Transaction Management.**
 
-A MySQL database and a layered Java/JDBC console application that simulate the core of a retail bank:
+A MySQL database and a layered Java/JDBC **desktop application (Swing)** that simulate the core of a retail bank:
 - customers, branches and banking products;
 - accounts with joint holders and a controlled lifecycle;
 - deposits, withdrawals, atomic transfers and beneficiaries;
@@ -15,8 +15,8 @@ Design approach: *bank-grade thinking at academic-project scale*. Every financia
 | | |
 |---|---|
 | Database | MySQL 8.0.16+ (developed and tested on 26.7.0) — 15 tables in 3NF/BCNF, 39 CHECK constraints, 19 foreign keys, 7 secondary indexes, 6 triggers, 11 views |
-| Application | Java 17+ (plain JDBC, no frameworks), Maven, Connector/J 8.4.0 |
-| Tests | 147 JUnit 5 tests (unit, database-constraint, integration, rollback, concurrency, regression): **147 pass** |
+| Application | Java 17+ desktop GUI (Swing, part of the JDK) plus an optional console mode; plain JDBC, no frameworks; Maven; Connector/J 8.4.0 |
+| Tests | 152 JUnit 5 tests (unit, database-constraint, integration, rollback, concurrency, regression, GUI): **152 pass** |
 
 ## 1. Features
 
@@ -38,16 +38,18 @@ sql/                 00 create DB + app user · 01 schema · 02 triggers · 03 v
                      05 sample data · 06 integrity checks · 07 report queries · 08 SQL feature demo
 scripts/             setup_database.sh · export_sample_data.sh
 src/main/java/com/bankdbms/
+  gui/               desktop application (Swing): BankApp entry point, MainFrame, one panel per screen
   app/               Main (console entry point), AppContext (wiring)
-  ui/                console menus
+  ui/                console menus (optional text mode)
   service/           business rules and transaction boundaries
   ledger/            PostingEngine, AccountLocker (double-entry posting, locking)
   dao/               JDBC data access (PreparedStatement only)
   db/                connections, TransactionRunner, error translation, script runner
   model/ report/ util/ exception/ config/ tools/
-src/test/java/...    147 tests
+src/test/java/...    152 tests (including headless GUI tests)
 docs/                design, SQL, architecture, testing, user guide, viva, report material, audit
 docs/evidence/       real outputs: test catalogue, build log, report/demo output, console session
+docs/screenshots/    the desktop screens, rendered by the GUI test
 ```
 
 ## 3. Setup
@@ -90,10 +92,14 @@ Alternatively, set `DB_URL`, `DB_USER` and `DB_PASSWORD` as environment variable
 
 ### 3.5 Build and run
 ```bash
-mvn clean package            # compiles, runs all 147 tests, builds target/bank-dbms.jar
-java -jar target/bank-dbms.jar
+mvn clean package            # compiles, runs all 152 tests, builds target/bank-dbms.jar
+java -jar target/bank-dbms.jar               # opens the desktop application
+java -jar target/bank-dbms.jar --console     # optional text-mode console
 ```
-To build without running the tests: `mvn -DskipTests package`.
+- **Double-click:** you can also double-click `target/bank-dbms.jar` in Finder or Explorer. The app finds `db.properties` in the project folder automatically.
+- **Faster build:** to build without running the tests, use `mvn -DskipTests package`.
+
+![Dashboard](docs/screenshots/1_dashboard.png)
 
 ## 4. Running the tests
 
@@ -121,7 +127,7 @@ The test database name must end in `_test`, and the suite refuses to rebuild any
 | [docs/04_sql_and_reports.md](docs/04_sql_and_reports.md) | Views, the 7 reports, SQL feature map, EXPLAIN evidence |
 | [docs/05_architecture.md](docs/05_architecture.md) | Layers, transaction flow, locking, error handling, security |
 | [docs/06_testing.md](docs/06_testing.md) | Strategy, results, key scenarios, defects found |
-| [docs/07_user_guide.md](docs/07_user_guide.md) | Console walkthrough with the sample data |
+| [docs/07_user_guide.md](docs/07_user_guide.md) | Desktop application guide (with screenshots) and console walkthrough |
 | [docs/08_viva_preparation.md](docs/08_viva_preparation.md) | Questions and answers grounded in this implementation |
 | [docs/09_report_material.md](docs/09_report_material.md) | Material for the PBL report chapters |
 | [docs/10_final_audit.md](docs/10_final_audit.md) | Final audit and Definition of Done |
@@ -130,7 +136,7 @@ The test database name must end in `_test`, and the suite refuses to rebuild any
 
 ## 6. Limitations (by design)
 
-- **Interface:** console only, a single operator role, no login (Review 1 scope).
+- **Interface:** single operator role, no login.
 - **Products:** single currency; no interest accrual on deposit accounts; no fixed deposits.
 - **Payments:** no transfers to other banks.
 - **Loans:** exact-instalment repayment only (no partial or advance payment); loan transactions cannot be reversed.

@@ -3,7 +3,8 @@
 ## 1. Layers
 
 ```
-Presentation   com.bankdbms.ui        console menus: input, output, error display
+Presentation   com.bankdbms.gui       desktop application (Swing): MainFrame + one panel per screen
+               com.bankdbms.ui        optional console menus (same services)
      ↓
 Service        com.bankdbms.service   business rules, validation, transaction boundaries
      ↓
@@ -52,6 +53,17 @@ Supporting packages:
 | `ReportService` | Statements and all reports, read from views. Runs the invariant checks. |
 | `CustomerService`, `BranchService`, `AccountTypeService`, `BeneficiaryService` | CRUD/search with validation. |
 
+## 2a. Desktop application (`com.bankdbms.gui`)
+
+| Class | Responsibility |
+|---|---|
+| `BankApp` | Entry point (`java -jar`). Sets the system look and feel, loads the configuration, checks the connection, opens `MainFrame`. `--console` starts the text console instead. |
+| `MainFrame` | Window with eight tabs; selecting a tab reloads that screen from the database (`Refreshable`). |
+| `DashboardPanel`, `CustomersPanel`, `AccountsPanel`, `TransactionsPanel`, `BeneficiariesPanel`, `LoansPanel`, `BranchesPanel`, `ReportsPanel` | One screen per area. They only call services and never touch JDBC. |
+| `Gui`, `FormPanel`, `DataTable`, `RowTableModel`, `Pickers`, `Choice` | Shared pieces: error boundary and dialogs, label/field forms, sortable tables with money/date formatting and status colours, table models built from `ReportTable`s, drop-downs filled from the database. |
+
+The GUI is a second presentation layer on the same services. The business rules, transactions and validation are identical to the console's, and so are the tests that cover them. Database calls run on the Swing event thread: with a local database they take milliseconds, and this keeps the code simple. A remote database would warrant `SwingWorker`.
+
 ## 3. How a transfer stays atomic
 
 ```mermaid
@@ -97,7 +109,8 @@ Tests TC-TRF-09 and TC-TRF-10 inject a `SQLException` after the debit entry, and
 
 | Layer | Behaviour |
 |---|---|
-| UI (`Menu`) | Catches `BankException` and prints its message (always operator-safe). Any other exception is logged with its stack trace to `logs/bank-dbms.log`, and the operator sees a generic message. |
+| GUI (`Gui.attempt`) | Every button action runs inside one error boundary: a `BankException` shows its safe message in a dialog; anything else is logged and reported generically. |
+| Console (`Menu`) | Catches `BankException` and prints its message (always operator-safe). Any other exception is logged with its stack trace to `logs/bank-dbms.log`, and the operator sees a generic message. |
 | Service | Validates input (`Validator`, `Money`) before opening a transaction. Throws `ValidationException`, `NotFoundException`, `BusinessRuleException`, `InsufficientFundsException`, `AccountStateException`. |
 | JDBC | `SqlErrorTranslator` converts database rejections into the same exception types, using constraint names (e.g. `uq_customer_email` → "A customer with this email address already exists."). Deadlocks and lock timeouts become "Please try again". Unknown errors become a generic `DataAccessException`, with details logged only. |
 | Database | Constraints and triggers reject anything the Java layer missed (defence in depth). |

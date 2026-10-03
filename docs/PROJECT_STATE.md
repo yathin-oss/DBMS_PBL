@@ -6,7 +6,8 @@ Last updated: 2026-10-03 — **all gates (1–14) completed.**
 Final audit complete ([10_final_audit.md](10_final_audit.md)). Waiting for the project owner's review.
 
 **Git:**
-- A local repository exists with **no commits** (none made without explicit approval).
+- Commit `3c627e4` (console version) exists locally.
+- The GUI work is **not committed yet**.
 - No remote is configured.
 
 ## Completed
@@ -23,9 +24,10 @@ Final audit complete ([10_final_audit.md](10_final_audit.md)). Waiting for the p
 | 9 Loans | EMI schedule, repayments, derived outstanding/overdue |
 | 10 Statements + reports | 7 required + trial balance, charge and daily summaries |
 | 11 Validation + errors | `Validator`, `SqlErrorTranslator`, safe logging |
-| 12 Testing | 147/147 PASS, catalogue generated from Surefire XML |
+| 12 Testing | 152/152 PASS, catalogue generated from Surefire XML |
 | 13 Documentation | README and docs 01–10, evidence folder |
 | 14 Final audit | [10](10_final_audit.md) |
+| GUI (owner request) | Swing desktop application as the main interface (`java -jar`); console kept (`--console`); TC-GUI-01..05; screenshots in docs/screenshots |
 
 ## Approved decisions
 See [01 §6](01_requirements.md#6-approved-decisions-log).
@@ -42,7 +44,7 @@ The owner said "complete the whole project on your own". These are documented an
 - least-privilege app user without DELETE.
 
 ## Known bugs
-None known. All 147 tests pass, and all 13 invariants hold on the sample data.
+None known. All 152 tests pass, and all 13 invariants hold on the sample data.
 
 ## Known risks
 | Risk | Mitigation / status |
@@ -54,7 +56,7 @@ None known. All 147 tests pass, and all 13 invariants hold on the sample data.
 | CASH account lock serialises all cash operations | Documented limitation (05 §4); fine for a single operator |
 
 ## Test status
-147 automated tests: **147 PASS, 0 FAIL, 0 NOT VERIFIED** (final run, `mvn clean package`). Scripted console session recorded.
+152 automated tests: **152 PASS, 0 FAIL, 0 NOT VERIFIED** (final run, `mvn clean package`). Scripted console session recorded.
 
 ## Documentation status
 README and docs 01–10, traceability matrix and evidence are all current with the final code.

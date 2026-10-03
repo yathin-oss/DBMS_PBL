@@ -49,7 +49,8 @@ public final class Main {
         }
     }
 
-    private static void checkConnection(DbConfig config) {
+    /** Verifies the database is reachable; throws a friendly BankException otherwise. */
+    public static void checkConnection(DbConfig config) {
         try (Connection conn = new ConnectionFactory(config).open()) {
             if (!conn.isValid(5)) {
                 throw new SQLException("Connection is not valid");
@@ -63,7 +64,8 @@ public final class Main {
         }
     }
 
-    private static void configureLogging() {
+    /** Sends technical logs to logs/bank-dbms.log only (never to the operator's screen). */
+    public static void configureLogging() {
         Logger root = Logger.getLogger("");
         for (Handler h : root.getHandlers()) {
             root.removeHandler(h);

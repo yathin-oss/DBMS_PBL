@@ -6,7 +6,7 @@ Last updated: 2026-10-03 (final audit, Gate 14).
 - **VERIFIED:** an executed test or a recorded command output proves it.
 - **IMPLEMENTED:** built but proven only by inspection.
 
-Test IDs refer to [evidence/test_catalogue_generated.md](evidence/test_catalogue_generated.md); all 147 tests PASS.
+Test IDs refer to [evidence/test_catalogue_generated.md](evidence/test_catalogue_generated.md); all 152 tests PASS.
 
 | Req | Description | Design | Implementation | Test / evidence | Status |
 |---|---|---|---|---|---|
@@ -54,6 +54,7 @@ Test IDs refer to [evidence/test_catalogue_generated.md](evidence/test_catalogue
 | NFR-05 | PreparedStatement only | 05 §6 | `JdbcSupport`, DAOs | `createStatement` appears only in `SqlScriptRunner` (trusted script files); TC-CUS-06 (LIKE escaping) | VERIFIED |
 | NFR-06 | No secrets in VCS | 05 §6 | `.gitignore`, `*.example`, runtime config outside the jar | `git check-ignore` on both db.properties; jar contains no db.properties; 0 password hits in docs/logs | VERIFIED |
 | NFR-07 | Friendly errors | 05 §5 | `SqlErrorTranslator`, `Menu` | TC-JDBC-05, console session | VERIFIED |
-| NFR-08 | Layered architecture, no frameworks | 05 §1 | packages ui/service/ledger/dao/db | pom.xml (only connector-j and junit) | VERIFIED |
+| NFR-08 | Layered architecture, no frameworks | 05 §1 | packages gui/ui → service → ledger → dao → db | pom.xml (only connector-j and junit) | VERIFIED |
 | NFR-09 | History never deleted | 03 §9 | triggers; app user has no DELETE | TC-DB-17..20, TC-JDBC-03 | VERIFIED |
-| NFR-10 | Tests with evidence | 06 | 147 tests | evidence/ | VERIFIED |
+| NFR-10 | Tests with evidence | 06 | 152 tests | evidence/ | VERIFIED |
+| UI-01 | Desktop Java application (owner request 2026-10-03) | 05 §2a | `com.bankdbms.gui` (8 screens) | TC-GUI-01..05, docs/screenshots | VERIFIED |

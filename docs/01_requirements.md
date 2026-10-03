@@ -73,7 +73,7 @@ Stack: Java · JDBC · MySQL. Single actor: bank staff / operator (console appli
 **In scope:** everything in §2–§3.
 
 **Out of scope** (Review 1 decisions unless labelled):
-- GUI / web front end (console only)
+- Web front end (a desktop Swing GUI was added on 2026-10-03; see §6)
 - Authentication / multiple user roles
 - Multi-currency
 - Interest accrual on deposit accounts (interest rate on account types is informational)
@@ -175,3 +175,4 @@ Internal accounts: CASH and LOAN_RECEIVABLE are debit-normal (assets). FEE_INCOM
 | 2026-10-03 | Ledger = transaction header + debit/credit entries, with five internal accounts |
 | 2026-10-03 | Lifecycle ACTIVE / FROZEN / BLOCKED / CLOSED with status history; third-party transfers only to ACTIVE beneficiaries |
 | 2026-10-03 | No separate university requirements document; master prompt §5 is the baseline |
+| 2026-10-03 | Owner request: "I need a Java application, not terminal output". A Swing desktop GUI is added as the main interface, reusing the same service layer; the console stays available (`--console`). This supersedes the Review 1 "console only" scope item. |

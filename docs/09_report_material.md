@@ -4,7 +4,7 @@ Draft text for the chapters of the university report template (`PBL Report Templ
 
 ## Abstract
 
-This project designs and implements a relational database management system for bank account and transaction management, together with a layered Java/JDBC application.
+This project designs and implements a relational database management system for bank account and transaction management, together with a layered Java/JDBC desktop application.
 
 **Database.** The MySQL database models customers, branches, banking products, accounts with joint holders, a double-entry transaction ledger, transfers, beneficiaries, service charges, loans, loan schedules and loan repayments.
 - **Normalization:** derived step by step from unnormalized documents to Third Normal Form (in fact BCNF).
@@ -14,7 +14,7 @@ This project designs and implements a relational database management system for 
 - **Posting rules:** the engine locks accounts in a fixed order, enforces account-lifecycle and minimum-balance rules, and records balanced debit and credit entries.
 - **Reports:** statements, balances, transaction audit, transfers, loan outstanding, loan repayments and branch summaries, all derived from views.
 
-**Evaluation.** 147 automated tests pass. They cover database constraints, business rules, rollback under injected failures, concurrent transfers and report correctness. Thirteen ledger invariants (for example, total debits equal total credits) hold after every test and on the delivered sample data.
+**Evaluation.** 152 automated tests pass. They cover database constraints, business rules, rollback under injected failures, concurrent transfers, report correctness and the desktop screens. Thirteen ledger invariants (for example, total debits equal total credits) hold after every test and on the delivered sample data.
 
 ## 1. Introduction
 - **Problem:** manual or spreadsheet tracking cannot stop overdrafts, transfers to non-existent accounts, duplicate account numbers or untraceable balance changes (Review 1).
@@ -54,10 +54,10 @@ See [01 §4](01_requirements.md#4-scope).
 ## 6. Implementation
 - **Size:** 9 SQL scripts and 99 Java source files (about 5,400 lines) in 12 packages, plus 19 test classes (about 2,100 lines). Key classes: `PostingEngine`, `AccountLocker`, `TransactionRunner`, `SqlErrorTranslator`, and the services.
 - **Technologies:** Java 17, JDBC (Connector/J 8.4.0), MySQL 8.0.16+, Maven, JUnit 5.
-- **Screenshots:** take them from the console session ([evidence/console_session.txt](evidence/console_session.txt)) or a live run of the user-guide tour ([07](07_user_guide.md)).
+- **Screenshots:** the desktop screens are in [screenshots/](screenshots) (rendered by the GUI test with the sample data). The console session is in [evidence/console_session.txt](evidence/console_session.txt).
 
 ## 7. Results
-- **Tests:** 147/147 pass ([06](06_testing.md), [catalogue](evidence/test_catalogue_generated.md)).
+- **Tests:** 152/152 pass ([06](06_testing.md), [catalogue](evidence/test_catalogue_generated.md)).
 - **Sample data:** generated through the services. 96 transactions and 199 entries; all 13 invariants report 0 violations.
 - **Reports:** output in [evidence/07_reports_output.txt](evidence/07_reports_output.txt).
 - **Indexes:** confirmed with EXPLAIN ([04 §4](04_sql_and_reports.md#4-index-evidence)).

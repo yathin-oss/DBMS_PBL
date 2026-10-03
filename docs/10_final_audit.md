@@ -67,7 +67,8 @@ Audit date: 2026-10-03.
 | Integrity | PASS | TC-DB-01..20, invariant hook |
 | Transaction | PASS | TC-TRF-09..11, TC-DEP-05 |
 | Regression | PASS | TC-REG-01..04 |
-| Totals | PASS | 147/147 ([catalogue](evidence/test_catalogue_generated.md), [build log](evidence/maven_build_and_test_output.txt)) |
+| GUI | PASS | TC-GUI-01..05: all 8 screens load; deposit by button click; statement from the Reports screen |
+| Totals | PASS | 152/152 ([catalogue](evidence/test_catalogue_generated.md), [build log](evidence/maven_build_and_test_output.txt)) |
 
 ## Security
 | Check | Result | Evidence |

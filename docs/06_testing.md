@@ -2,7 +2,7 @@
 
 ## 1. Result
 
-**147 automated tests, 147 PASS, 0 FAIL, 0 NOT VERIFIED.** This is the final run of `mvn clean package` on 2026-10-03.
+**152 automated tests, 152 PASS, 0 FAIL, 0 NOT VERIFIED.** This is the final run of `mvn clean package` on 2026-10-03.
 
 | Evidence | File |
 |---|---|
@@ -11,6 +11,7 @@
 | Output of the 7 report queries | [evidence/07_reports_output.txt](evidence/07_reports_output.txt) |
 | Output of the SQL feature demo, including EXPLAIN and the transaction/savepoint demo | [evidence/08_sql_feature_demo_output.txt](evidence/08_sql_feature_demo_output.txt) |
 | Scripted end-to-end session of the real console application | [evidence/console_session.txt](evidence/console_session.txt) |
+| Desktop screens rendered by the GUI test (including after a deposit and a statement) | [screenshots/](screenshots) |
 
 **Environment:** macOS 26.5.2, MySQL 26.7.0 (Homebrew), Connector/J 8.4.0. Maven ran on Java 26.0.2; the bytecode target is Java 17.
 
@@ -27,6 +28,7 @@
 | Invariant | Ledger correctness after **every** integration test | `@AfterEach` runs all 13 checks in `06_verification_queries.sql` |
 | Regression | The shipped sample data installs cleanly and the app works on top of it | `SampleDataRegressionTest` |
 | Manual / E2E | The real console jar with scripted input | `evidence/console_session.txt` |
+| GUI | All eight desktop screens built headless against the sample data; a deposit made by clicking the button; a statement run from the Reports screen | `GuiSmokeTest` (TC-GUI-01..05), screenshots |
 
 **How to run:** see the README. In short, set up `src/test/resources/db.properties` from the example file, then run `mvn test`. The tests DROP and re-create `bank_dbms_test` (guarded: the name must end in `_test`).
 
@@ -49,7 +51,8 @@
 | TC-LOAN | Loans, schedules, repayments, overdue | 10 |
 | TC-RPT | Statements and reports | 10 |
 | TC-REG | Sample-data regression | 4 |
-| **Total** | | **147** (counting each parameterised case separately) |
+| TC-GUI | Desktop application | 5 |
+| **Total** | | **152** (counting each parameterised case separately) |
 
 ## 4. Key scenarios in detail
 
@@ -90,9 +93,10 @@
 | 5 | Test review | `db.properties` under `src/main/resources` would have been packaged into the jar with its password | Runtime config moved to the gitignored project root; tests load their own classpath file |
 | 6 | Code review | Charge override validated twice; dead helper methods; an `IllegalArgumentException` from bad enum input in the UI would have shown as an "unexpected error" | Cleaned up; enum input now raises `ValidationException` |
 | 7 | MoneyAndValidatorTest | Test expected `Money.parse` to normalise scale | Test corrected (parsing keeps the exact input; `requirePositive` normalises) |
+| 8 | GUI snapshot review | Money columns not formatted (JTable picks its own renderer for numbers); columns cut off; full-width form fields | One renderer for all cells; column auto-sizing after model changes; natural-width form fields |
 
 ## 6. Known limitations of the test suite
 
 - Tests run on one machine and one MySQL version (26.7.0). Compatibility with MySQL 8.0/8.4 and Windows is **NOT VERIFIED**.
-- The console UI is exercised by one scripted end-to-end session, not by automated UI tests. All the logic it calls is covered by service tests.
+- The desktop GUI tests run headless. They do not cover dialogs that need a person to click OK (for example the open-account form); the services behind those dialogs are covered by integration tests. The console is covered by one scripted session.
 - The concurrency test proves no lost updates or deadlocks for two hot accounts. It is not a load test.

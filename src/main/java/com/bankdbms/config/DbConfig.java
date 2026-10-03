@@ -5,6 +5,8 @@ import com.bankdbms.exception.BankException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +19,7 @@ import java.util.Properties;
  * <ol>
  *   <li>environment variables {@code DB_URL}, {@code DB_USER}, {@code DB_PASSWORD};</li>
  *   <li>the file named by system property {@code bankdbms.config};</li>
- *   <li>{@code ./db.properties} in the working directory;</li>
+ *   <li>{@code ./db.properties} in the working directory, or next to the running jar / in its parent folder;</li>
  *   <li>{@code db.properties} on the classpath (used by the test suite).</li>
  * </ol>
  *
@@ -99,10 +101,36 @@ public record DbConfig(String url, String user, String password, String adminUse
         return value == null || value.isBlank() ? null : value.trim();
     }
 
+    /**
+     * ./db.properties, or else db.properties next to the running jar or in its parent folder
+     * (so double-clicking target/bank-dbms.jar finds the project's db.properties).
+     */
+    private static Path locateSettingsFile() {
+        Path local = Path.of("db.properties");
+        if (Files.isRegularFile(local)) {
+            return local;
+        }
+        CodeSource source = DbConfig.class.getProtectionDomain().getCodeSource();
+        if (source != null) {
+            try {
+                Path code = Path.of(source.getLocation().toURI());
+                Path jarDir = Files.isDirectory(code) ? code : code.getParent();
+                for (Path dir : new Path[]{jarDir, jarDir == null ? null : jarDir.getParent()}) {
+                    if (dir != null && Files.isRegularFile(dir.resolve("db.properties"))) {
+                        return dir.resolve("db.properties");
+                    }
+                }
+            } catch (URISyntaxException e) {
+                // fall back to the working directory / classpath
+            }
+        }
+        return local;
+    }
+
     private static Properties readProperties() {
         Properties props = new Properties();
         String explicit = System.getProperty("bankdbms.config");
-        Path path = explicit != null ? Path.of(explicit) : Path.of("db.properties");
+        Path path = explicit != null ? Path.of(explicit) : locateSettingsFile();
         try {
             if (Files.isRegularFile(path)) {
                 try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
