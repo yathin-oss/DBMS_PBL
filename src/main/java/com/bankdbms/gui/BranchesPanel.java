@@ -4,9 +4,7 @@ import com.bankdbms.app.AppContext;
 import com.bankdbms.model.AccountType;
 import com.bankdbms.model.Branch;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
@@ -24,17 +22,15 @@ public class BranchesPanel extends JPanel implements Refreshable {
     public BranchesPanel(AppContext app) {
         super(new BorderLayout());
         this.app = app;
-        add(Gui.heading("Branches and products"), BorderLayout.NORTH);
-        JPanel branches = new JPanel(new BorderLayout());
-        branches.setBorder(BorderFactory.createTitledBorder("Branches"));
-        branches.add(Gui.toolbar(Gui.button("New branch...", this::newBranch),
-                Gui.button("Edit contact details...", this::editBranch)), BorderLayout.NORTH);
-        branches.add(new JScrollPane(branchTable), BorderLayout.CENTER);
-        JPanel products = new JPanel(new BorderLayout());
-        products.setBorder(BorderFactory.createTitledBorder("Account types (banking products and internal ledger categories)"));
-        products.add(Gui.toolbar(Gui.button("New product...", this::newProduct)), BorderLayout.NORTH);
-        products.add(new JScrollPane(new DataTable(productModel)), BorderLayout.CENTER);
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, branches, products);
+        Gui.page(this);
+        add(Gui.pageHeader("Branches and products", "Branch network and the account types (banking products and internal ledger categories)",
+                null), BorderLayout.NORTH);
+        branchTable.emptyText("No branches yet.");
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                Gui.card("Branches", Gui.scroll(branchTable), Gui.primary("New branch...", this::newBranch),
+                        Gui.button("Edit contact details...", this::editBranch)),
+                Gui.card("Account types", Gui.scroll(new DataTable(productModel).emptyText("No account types defined.")),
+                        Gui.primary("New product...", this::newProduct)));
         split.setResizeWeight(0.5);
         add(split, BorderLayout.CENTER);
     }

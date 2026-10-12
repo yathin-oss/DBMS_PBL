@@ -7,8 +7,6 @@ import com.bankdbms.exception.BankException;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * Desktop (Swing) entry point. Uses exactly the same services, ledger and database as the console;
@@ -25,15 +23,12 @@ public final class BankApp {
             return;
         }
         Main.configureLogging();
+        System.setProperty("awt.useSystemAAFontSettings", "on");    // smooth text on every platform
         SwingUtilities.invokeLater(BankApp::start);
     }
 
     private static void start() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ReflectiveOperationException | UnsupportedLookAndFeelException e) {
-            // keep the default look and feel
-        }
+        Theme.install();
         try {
             DbConfig config = DbConfig.load();
             Main.checkConnection(config);

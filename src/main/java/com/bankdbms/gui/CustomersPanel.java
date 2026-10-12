@@ -7,10 +7,8 @@ import com.bankdbms.model.Gender;
 import com.bankdbms.model.IdProofType;
 import com.bankdbms.util.Validator;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
@@ -23,7 +21,7 @@ public class CustomersPanel extends JPanel implements Refreshable {
     private static final List<String> HEADERS = List.of("Id", "Name", "Date of birth", "Email", "Phone", "City", "ID proof");
 
     private final AppContext app;
-    private final JTextField search = new JTextField(20);
+    private final JTextField search = new HintTextField("Search by name, email, phone or ID", 24);
     private final RowTableModel model = new RowTableModel();
     private final DataTable table = new DataTable(model);
     private final RowTableModel accountsModel = new RowTableModel();
@@ -31,20 +29,18 @@ public class CustomersPanel extends JPanel implements Refreshable {
     public CustomersPanel(AppContext app) {
         super(new BorderLayout());
         this.app = app;
+        Gui.page(this);
         search.addActionListener(e -> refresh());
-        JPanel top = new JPanel(new BorderLayout());
-        top.add(Gui.heading("Customers"), BorderLayout.NORTH);
-        top.add(Gui.toolbar(new javax.swing.JLabel("Search name / email / phone / ID:"), search,
-                Gui.button("Search", this::refresh), Gui.button("Show all", () -> {
+        add(Gui.pageHeader("Customers", "Register, search and update customer records",
+                Gui.toolbar(search, Gui.button("Search", this::refresh), Gui.button("Show all", () -> {
                     search.setText("");
                     refresh();
-                }), Gui.button("Register customer...", this::register), Gui.button("Edit selected...", this::edit)),
-                BorderLayout.SOUTH);
-        add(top, BorderLayout.NORTH);
-        JPanel lower = new JPanel(new BorderLayout());
-        lower.setBorder(BorderFactory.createTitledBorder("Accounts of the selected customer"));
-        lower.add(new JScrollPane(new DataTable(accountsModel)), BorderLayout.CENTER);
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(table), lower);
+                }), Gui.primary("Register customer...", this::register), Gui.button("Edit selected...", this::edit))),
+                BorderLayout.NORTH);
+        table.emptyText("No customers match the search.");
+        DataTable accounts = new DataTable(accountsModel).emptyText("Select a customer above to see their accounts.");
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, Gui.card("All customers", Gui.scroll(table)),
+                Gui.card("Accounts of the selected customer", Gui.scroll(accounts)));
         split.setResizeWeight(0.65);
         add(split, BorderLayout.CENTER);
         table.getSelectionModel().addListSelectionListener(e -> {

@@ -7,7 +7,6 @@ import com.bankdbms.model.Beneficiary;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -25,14 +24,17 @@ public class BeneficiariesPanel extends JPanel implements Refreshable {
     public BeneficiariesPanel(AppContext app) {
         super(new BorderLayout());
         this.app = app;
+        Gui.page(this);
         customer.addActionListener(e -> load());
-        JPanel top = new JPanel(new BorderLayout());
-        top.add(Gui.heading("Beneficiaries (saved payees)"), BorderLayout.NORTH);
-        top.add(Gui.toolbar(new JLabel("Customer:"), customer, Gui.button("Add beneficiary...", this::add),
-                Gui.button("Rename...", this::rename), Gui.button("Deactivate", () -> setActive(false)),
-                Gui.button("Reactivate", () -> setActive(true))), BorderLayout.SOUTH);
-        add(top, BorderLayout.NORTH);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        JLabel owner = new JLabel("Customer");
+        owner.setFont(Theme.LABEL);
+        owner.setLabelFor(customer);
+        add(Gui.pageHeader("Beneficiaries", "Saved payees that a customer can transfer money to",
+                Gui.toolbar(owner, customer, Gui.primary("Add beneficiary...", this::add),
+                Gui.button("Rename...", this::rename), Gui.danger("Deactivate", () -> setActive(false)),
+                Gui.button("Reactivate", () -> setActive(true)))), BorderLayout.NORTH);
+        table.emptyText("This customer has no saved beneficiaries.");
+        add(Gui.card("Saved payees of the selected customer", Gui.scroll(table)), BorderLayout.CENTER);
     }
 
     @Override

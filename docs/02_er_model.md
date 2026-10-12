@@ -187,7 +187,7 @@ Notation: **PK** primary key · **CK** other candidate key · **FK** foreign key
 
 ## 4. ER diagram
 
-Source below (Mermaid, rendered by GitHub). Rendered image: [diagrams/er_diagram.png](diagrams/er_diagram.png). Derived attributes are omitted from the diagram; full column lists are in 03.
+Full diagram (all 15 tables with every column, data type, PK/FK/UK, nullable and generated columns, all 19 foreign keys in crow's-foot notation): [PNG](diagrams/er_diagram.png) · [SVG](diagrams/er_diagram.svg) · [PDF](diagrams/er_diagram.pdf). It was cross-checked against the live database's `information_schema`. The Mermaid source below is a condensed summary rendered by GitHub; full column definitions are in 03.
 
 ![ER diagram](diagrams/er_diagram.png)
 

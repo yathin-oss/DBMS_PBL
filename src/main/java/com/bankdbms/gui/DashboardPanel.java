@@ -6,13 +6,9 @@ import com.bankdbms.report.InvariantResult;
 import com.bankdbms.report.ReportTable;
 import com.bankdbms.ui.TablePrinter;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,43 +21,46 @@ public class DashboardPanel extends JPanel implements Refreshable {
     private final JLabel accounts = new JLabel();
     private final JLabel deposits = new JLabel();
     private final JLabel loans = new JLabel();
+    private final JLabel loansCaption = Gui.muted(" ");
     private final JLabel overdue = new JLabel();
+    private final JLabel overdueCaption = Gui.muted(" ");
     private final JLabel integrity = new JLabel();
     private final RowTableModel branchModel = new RowTableModel();
 
     public DashboardPanel(AppContext app) {
         super(new BorderLayout());
         this.app = app;
-        JPanel cards = new JPanel(new GridLayout(2, 3, 10, 10));
-        cards.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        cards.add(card("Customers", customers));
-        cards.add(card("Customer accounts", accounts));
-        cards.add(card("Total deposits", deposits));
-        cards.add(card("Loans outstanding", loans));
-        cards.add(card("Overdue instalments", overdue));
-        cards.add(card("Ledger integrity (13 checks)", integrity));
-        JPanel top = new JPanel(new BorderLayout());
-        top.add(Gui.heading("Dashboard"), BorderLayout.NORTH);
+        Gui.page(this);
+        JPanel cards = new JPanel(new GridLayout(2, 3, Theme.SPACE_L, Theme.SPACE_L));
+        cards.setOpaque(false);
+        cards.add(card("Customers", customers, Gui.muted("Registered customers")));
+        cards.add(card("Customer accounts", accounts, Gui.muted("Across all branches and products")));
+        cards.add(card("Total deposits", deposits, Gui.muted("Sum of customer account balances")));
+        cards.add(card("Loans outstanding", loans, loansCaption));
+        cards.add(card("Overdue instalments", overdue, overdueCaption));
+        cards.add(card("Ledger integrity", integrity, Gui.muted("Double-entry invariants verified")));
+        JPanel top = new JPanel(new BorderLayout(0, Theme.SPACE_L));
+        top.setOpaque(false);
+        top.add(Gui.pageHeader("Dashboard", "Live overview of the bank's customers, balances, loans and ledger health",
+                Gui.toolbar(Gui.button("Refresh", this::refresh))), BorderLayout.NORTH);
         top.add(cards, BorderLayout.CENTER);
-        top.add(Gui.toolbar(Gui.button("Refresh", this::refresh)), BorderLayout.SOUTH);
         add(top, BorderLayout.NORTH);
-        JPanel branches = new JPanel(new BorderLayout());
-        branches.setBorder(BorderFactory.createTitledBorder("Branch summary"));
-        branches.add(new JScrollPane(new DataTable(branchModel)), BorderLayout.CENTER);
-        add(branches, BorderLayout.CENTER);
+        add(Gui.card("Branch summary", Gui.scroll(new DataTable(branchModel).emptyText("No branches found."))),
+                BorderLayout.CENTER);
     }
 
-    private static JPanel card(String title, JLabel value) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(Color.WHITE);
-        p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(0xD0D7E2)),
-                BorderFactory.createEmptyBorder(10, 14, 10, 14)));
+    private static JPanel card(String title, JLabel value, JLabel caption) {
+        Card p = new Card(new BorderLayout(0, Theme.SPACE_XS));
         JLabel t = new JLabel(title);
-        t.setForeground(Color.DARK_GRAY);
-        value.setFont(value.getFont().deriveFont(Font.BOLD, 22f));
-        value.setForeground(Gui.ACCENT);
+        t.setFont(Theme.LABEL);
+        t.setForeground(Theme.TEXT_MUTED);
+        value.setFont(Theme.KPI);
+        value.setForeground(Theme.TEXT);
+        caption.setFont(Theme.SMALL);
         p.add(t, BorderLayout.NORTH);
         p.add(value, BorderLayout.CENTER);
+        p.add(caption, BorderLayout.SOUTH);
+        p.getAccessibleContext().setAccessibleName(title);
         return p;
     }
 
@@ -80,14 +79,16 @@ public class DashboardPanel extends JPanel implements Refreshable {
             BigDecimal outstanding = positions.stream().map(LoanPosition::outstandingPrincipal)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             long active = positions.stream().filter(p -> "ACTIVE".equals(p.loanStatus())).count();
-            loans.setText(TablePrinter.format(outstanding.setScale(2)) + "  (" + active + " active)");
+            loans.setText(TablePrinter.format(outstanding.setScale(2)));
+            loansCaption.setText(active + " active loan" + (active == 1 ? "" : "s"));
             int overdueCount = positions.stream().mapToInt(LoanPosition::installmentsOverdue).sum();
             overdue.setText(String.valueOf(overdueCount));
-            overdue.setForeground(overdueCount > 0 ? Gui.ERROR_RED : Gui.OK_GREEN);
+            overdue.setForeground(overdueCount > 0 ? Theme.ERROR : Theme.SUCCESS);
+            overdueCaption.setText(overdueCount > 0 ? "Past due and unpaid - needs follow-up" : "All instalments are on schedule");
             List<InvariantResult> checks = app.reports.verifyLedger();
             long failed = checks.stream().filter(r -> !r.passed()).count();
-            integrity.setText(failed == 0 ? "All " + checks.size() + " pass" : failed + " FAILED");
-            integrity.setForeground(failed == 0 ? Gui.OK_GREEN : Gui.ERROR_RED);
+            integrity.setText(failed == 0 ? "All " + checks.size() + " pass" : failed + " of " + checks.size() + " failed");
+            integrity.setForeground(failed == 0 ? Theme.SUCCESS : Theme.ERROR);
             branchModel.setReport(app.reports.branchSummary());
         });
     }

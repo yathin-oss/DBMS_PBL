@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
@@ -39,22 +38,26 @@ public class TransactionsPanel extends JPanel implements Refreshable {
     public TransactionsPanel(AppContext app) {
         super(new BorderLayout());
         this.app = app;
+        Gui.page(this);
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Deposit", depositTab());
         tabs.addTab("Withdraw", withdrawTab());
         tabs.addTab("Transfer", transferTab());
         tabs.addTab("Service charge", chargeTab());
         tabs.addTab("Reverse / look up", reverseTab());
-        JPanel top = new JPanel(new BorderLayout());
-        top.add(Gui.heading("Transactions"), BorderLayout.NORTH);
-        top.add(tabs, BorderLayout.CENTER);
+        JPanel top = new JPanel(new BorderLayout(0, Theme.SPACE_L));
+        top.setOpaque(false);
+        top.add(Gui.pageHeader("Transactions", "Post deposits, withdrawals, transfers and charges to the double-entry ledger",
+                null), BorderLayout.NORTH);
+        top.add(Gui.card(null, tabs), BorderLayout.CENTER);
         add(top, BorderLayout.NORTH);
-        JPanel result = new JPanel(new BorderLayout());
-        result.setBorder(BorderFactory.createTitledBorder("Result (double-entry ledger lines)"));
-        resultLabel.setBorder(BorderFactory.createEmptyBorder(2, 6, 4, 6));
+        JPanel result = new JPanel(new BorderLayout(0, Theme.SPACE_M));
+        result.setOpaque(false);
+        Gui.status(resultLabel, Gui.Tone.NEUTRAL, resultLabel.getText());
         result.add(resultLabel, BorderLayout.NORTH);
-        result.add(new JScrollPane(new DataTable(resultModel)), BorderLayout.CENTER);
-        add(result, BorderLayout.CENTER);
+        result.add(Gui.scroll(new DataTable(resultModel).emptyText("No transaction posted yet in this session.")),
+                BorderLayout.CENTER);
+        add(Gui.card("Result: double-entry ledger lines", result), BorderLayout.CENTER);
     }
 
     @Override
@@ -93,6 +96,9 @@ public class TransactionsPanel extends JPanel implements Refreshable {
         group.add(ownAccount);
         group.add(toBeneficiary);
         JPanel kind = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        kind.setOpaque(false);
+        ownAccount.setOpaque(false);
+        toBeneficiary.setOpaque(false);
         kind.add(ownAccount);
         kind.add(toBeneficiary);
         ownAccount.addActionListener(e -> updateTransferMode());
@@ -128,23 +134,30 @@ public class TransactionsPanel extends JPanel implements Refreshable {
                 .note("A reversal posts mirror-image entries and marks the original REVERSED. History is never edited.");
         JButton lookup = Gui.button("Look up", () -> Gui.attempt(this, () -> {
             resultModel.setReport(app.reports.transactionDetail(Gui.text(reference)));
-            resultLabel.setText("Transaction " + Gui.text(reference).toUpperCase());
+            Gui.status(resultLabel, Gui.Tone.NEUTRAL, "Transaction " + Gui.text(reference).toUpperCase());
         }));
-        JButton reverse = Gui.button("Post reversal", () -> {
+        JButton reverse = Gui.danger("Post reversal", () -> {
             if (Gui.confirm(this, "Reverse transaction", "Post a reversal of " + Gui.text(reference).toUpperCase() + "?")) {
                 post(() -> app.reversals.reverse(Gui.text(reference), Gui.text(reason)), reason);
             }
         });
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(form, BorderLayout.CENTER);
-        panel.add(Gui.toolbar(lookup, reverse), BorderLayout.SOUTH);
-        return panel;
+        return tabBody(form, lookup, reverse);
     }
 
     private JPanel withAction(FormPanel form, String label, Supplier<PostedTransaction> action, JTextField... clearAfter) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(form, BorderLayout.CENTER);
-        panel.add(Gui.toolbar(Gui.button(label, () -> post(action, clearAfter))), BorderLayout.SOUTH);
+        return tabBody(form, Gui.primary(label, () -> post(action, clearAfter)));
+    }
+
+    /** A sub-tab: the form, then its action buttons aligned under the fields. */
+    private static JPanel tabBody(FormPanel form, JButton... actions) {
+        JPanel stack = new JPanel(new BorderLayout(0, Theme.SPACE_M));
+        stack.setOpaque(false);
+        stack.add(form, BorderLayout.CENTER);
+        stack.add(Gui.toolbar(actions), BorderLayout.SOUTH);
+        JPanel panel = new JPanel(new BorderLayout());     // keeps the form at the top of a taller tab
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(Theme.SPACE_L, 0, 0, 0));
+        panel.add(stack, BorderLayout.NORTH);
         return panel;
     }
 
@@ -152,8 +165,8 @@ public class TransactionsPanel extends JPanel implements Refreshable {
         Gui.attempt(this, () -> {
             PostedTransaction t = action.get();
             resultModel.setReport(app.reports.transactionDetail(t.transaction().referenceNo()));
-            resultLabel.setText("Posted " + t.transaction().type() + "  " + t.transaction().referenceNo() + "  amount "
-                    + TablePrinter.format(t.amount()));
+            Gui.status(resultLabel, Gui.Tone.SUCCESS, "Posted " + t.transaction().type() + "  " + t.transaction().referenceNo()
+                    + "  amount " + TablePrinter.format(t.amount()));
             for (JTextField f : clearAfter) {
                 f.setText("");
             }

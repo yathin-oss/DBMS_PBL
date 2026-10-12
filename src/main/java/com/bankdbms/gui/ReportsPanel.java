@@ -7,12 +7,10 @@ import com.bankdbms.report.ReportTable;
 import com.bankdbms.report.StatementLine;
 import com.bankdbms.ui.TablePrinter;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.io.File;
@@ -57,23 +55,31 @@ public class ReportsPanel extends JPanel implements Refreshable {
     public ReportsPanel(AppContext app) {
         super(new BorderLayout());
         this.app = app;
+        Gui.page(this);
         report.addActionListener(e -> updateInputs());
-        JPanel top = new JPanel(new BorderLayout());
-        top.add(Gui.heading("Statements and reports"), BorderLayout.NORTH);
+        JPanel top = new JPanel(new BorderLayout(0, Theme.SPACE_L));
+        top.setOpaque(false);
+        top.add(Gui.pageHeader("Statements and reports", "Account statements and management reports, read directly from the database views",
+                null), BorderLayout.NORTH);
         FormPanel inputs = new FormPanel().add("Report", report).add("Account (statement only)", account)
                 .add("From date (yyyy-mm-dd)", from).add("To date (yyyy-mm-dd)", to);
-        top.add(inputs, BorderLayout.CENTER);
-        top.add(Gui.toolbar(Gui.button("Run report", this::run), Gui.button("Export CSV...", this::export)),
+        JPanel filters = new JPanel(new BorderLayout(0, Theme.SPACE_M));
+        filters.setOpaque(false);
+        filters.add(inputs, BorderLayout.CENTER);
+        filters.add(Gui.toolbar(Gui.primary("Run report", this::run), Gui.button("Export CSV...", this::export)),
                 BorderLayout.SOUTH);
+        top.add(Gui.card("Report options", filters), BorderLayout.CENTER);
         add(top, BorderLayout.NORTH);
-        JPanel result = new JPanel(new BorderLayout());
-        result.setBorder(BorderFactory.createTitledBorder("Result"));
-        header.setBorder(BorderFactory.createEmptyBorder(2, 6, 4, 6));
-        footer.setBorder(BorderFactory.createEmptyBorder(4, 6, 2, 6));
+        JPanel result = new JPanel(new BorderLayout(0, Theme.SPACE_M));
+        result.setOpaque(false);
+        header.setFont(Theme.BODY);
+        header.setForeground(Theme.TEXT);
+        footer.setFont(Theme.BODY);
+        footer.setForeground(Theme.TEXT);
         result.add(header, BorderLayout.NORTH);
-        result.add(new JScrollPane(new DataTable(model)), BorderLayout.CENTER);
+        result.add(Gui.scroll(new DataTable(model).emptyText("Choose a report and press Run report.")), BorderLayout.CENTER);
         result.add(footer, BorderLayout.SOUTH);
-        add(result, BorderLayout.CENTER);
+        add(Gui.card("Result", result), BorderLayout.CENTER);
         updateInputs();
     }
 
@@ -95,7 +101,7 @@ public class ReportsPanel extends JPanel implements Refreshable {
             String r = (String) report.getSelectedItem();
             title = r;
             footer.setText(" ");
-            header.setText(r);
+            header.setText("<html><b style='font-size:13pt'>" + r.replace("&", "&amp;") + "</b></html>");
             switch (r) {
                 case STATEMENT -> statement();
                 case BALANCES -> model.setReport(app.reports.accountBalances());
@@ -120,7 +126,7 @@ public class ReportsPanel extends JPanel implements Refreshable {
         int accountId = app.accounts.getByNumber(Gui.selected(account, "an account").key()).accountId();
         AccountStatement s = app.reports.statement(accountId, Gui.date(from, "From date"), Gui.date(to, "To date"));
         title = "statement_" + s.accountNumber();
-        header.setText("<html><b>Statement of account " + s.accountNumber() + "</b> &nbsp; " + s.productName() + ", "
+        header.setText("<html><b style='font-size:13pt'>Statement of account " + s.accountNumber() + "</b> &nbsp; " + s.productName() + ", "
                 + s.branchName() + " &nbsp; | &nbsp; Holder(s): " + s.holders() + " &nbsp; | &nbsp; Status: " + s.accountStatus()
                 + "<br>Period " + s.fromDate() + " to " + s.toDate() + " &nbsp; | &nbsp; Opening balance <b>"
                 + TablePrinter.format(s.openingBalance()) + "</b></html>");
@@ -132,8 +138,8 @@ public class ReportsPanel extends JPanel implements Refreshable {
         model.set(List.of("Date", "Reference", "Type", "Narration", "Debit (out)", "Credit (in)", "Balance", "Note"), rows);
         footer.setText("<html>Total debits <b>" + TablePrinter.format(s.totalDebits()) + "</b> &nbsp; Total credits <b>"
                 + TablePrinter.format(s.totalCredits()) + "</b> &nbsp; Closing balance <b>" + TablePrinter.format(s.closingBalance())
-                + "</b> &nbsp; " + (s.isConsistent() ? "<font color='#2E7D32'>opening + credits - debits = closing</font>"
-                : "<font color='#C62828'>INCONSISTENT</font>") + "</html>");
+                + "</b> &nbsp; " + (s.isConsistent() ? "<font color='#15803D'>opening + credits - debits = closing</font>"
+                : "<font color='#B91C1C'>INCONSISTENT</font>") + "</html>");
     }
 
     private void trialBalance() {
@@ -145,8 +151,9 @@ public class ReportsPanel extends JPanel implements Refreshable {
             dr = dr.add((BigDecimal) t.value(i, "debit_balance"));
             cr = cr.add((BigDecimal) t.value(i, "credit_balance"));
         }
-        footer.setText("Total debit balances " + TablePrinter.format(dr) + "   |   Total credit balances "
-                + TablePrinter.format(cr) + "   |   " + (dr.compareTo(cr) == 0 ? "BALANCED" : "NOT BALANCED"));
+        footer.setText("<html>Total debit balances <b>" + TablePrinter.format(dr) + "</b> &nbsp;|&nbsp; Total credit balances <b>"
+                + TablePrinter.format(cr) + "</b> &nbsp;|&nbsp; " + (dr.compareTo(cr) == 0
+                ? "<b><font color='#15803D'>BALANCED</font></b>" : "<b><font color='#B91C1C'>NOT BALANCED</font></b>") + "</html>");
     }
 
     private void integrity() {
@@ -154,7 +161,8 @@ public class ReportsPanel extends JPanel implements Refreshable {
         model.setItems(List.of("Invariant", "Violations", "Result"), results,
                 (InvariantResult r) -> Arrays.asList(r.invariant(), r.violations(), r.passed() ? "PASS" : "FAIL"));
         long failed = results.stream().filter(r -> !r.passed()).count();
-        footer.setText(failed == 0 ? "All " + results.size() + " ledger invariants hold." : failed + " invariant(s) FAILED.");
+        footer.setText(failed == 0 ? "<html><b><font color='#15803D'>All " + results.size() + " ledger invariants hold.</font></b></html>"
+                : "<html><b><font color='#B91C1C'>" + failed + " invariant(s) FAILED.</font></b></html>");
     }
 
     private void export() {

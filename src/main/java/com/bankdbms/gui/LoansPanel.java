@@ -9,11 +9,9 @@ import com.bankdbms.service.LoanService;
 import com.bankdbms.ui.TablePrinter;
 import com.bankdbms.util.LoanCalculator;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
@@ -36,17 +34,19 @@ public class LoansPanel extends JPanel implements Refreshable {
     public LoansPanel(AppContext app) {
         super(new BorderLayout());
         this.app = app;
-        JPanel top = new JPanel(new BorderLayout());
-        top.add(Gui.heading("Loans"), BorderLayout.NORTH);
-        top.add(Gui.toolbar(Gui.button("Refresh", this::refresh), Gui.button("Disburse loan...", this::disburse),
-                Gui.button("Repay next instalment...", this::repay)), BorderLayout.SOUTH);
-        add(top, BorderLayout.NORTH);
-        JPanel lower = new JPanel(new BorderLayout());
-        lower.setBorder(BorderFactory.createTitledBorder("Repayment schedule of the selected loan"));
-        summary.setBorder(BorderFactory.createEmptyBorder(2, 6, 4, 6));
+        Gui.page(this);
+        add(Gui.pageHeader("Loans", "Loan portfolio with derived outstanding amounts, overdue instalments and schedules",
+                Gui.toolbar(Gui.button("Refresh", this::refresh), Gui.primary("Disburse loan...", this::disburse),
+                Gui.button("Repay next instalment...", this::repay))), BorderLayout.NORTH);
+        table.emptyText("No loans have been disbursed.");
+        JPanel lower = new JPanel(new BorderLayout(0, Theme.SPACE_M));
+        lower.setOpaque(false);
+        summary.setFont(Theme.BODY);
         lower.add(summary, BorderLayout.NORTH);
-        lower.add(new JScrollPane(new DataTable(scheduleModel)), BorderLayout.CENTER);
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(table), lower);
+        lower.add(Gui.scroll(new DataTable(scheduleModel).emptyText("Select a loan above to see its repayment schedule.")),
+                BorderLayout.CENTER);
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, Gui.card("Loan portfolio", Gui.scroll(table)),
+                Gui.card("Repayment schedule of the selected loan", lower));
         split.setResizeWeight(0.4);
         add(split, BorderLayout.CENTER);
         table.getSelectionModel().addListSelectionListener(e -> {
@@ -80,9 +80,11 @@ public class LoansPanel extends JPanel implements Refreshable {
         }
         Gui.attempt(this, () -> {
             LoanPosition p = app.loans.position(id);
-            summary.setText(p.loanNumber() + "  |  disbursed " + p.disbursedOn() + "  |  total interest "
-                    + TablePrinter.format(p.totalInterest()) + "  |  principal repaid " + TablePrinter.format(p.principalRepaid())
-                    + "  |  interest paid " + TablePrinter.format(p.interestPaid()));
+            String sep = "&nbsp;&nbsp;&nbsp;<span style='color:#CBD5E1'>|</span>&nbsp;&nbsp;&nbsp;";
+            summary.setText("<html><b style='font-size:13pt'>" + p.loanNumber() + "</b>" + sep + "Disbursed " + p.disbursedOn()
+                    + sep + "Total interest <b>" + TablePrinter.format(p.totalInterest()) + "</b>" + sep
+                    + "Principal repaid <b>" + TablePrinter.format(p.principalRepaid()) + "</b>" + sep
+                    + "Interest paid <b>" + TablePrinter.format(p.interestPaid()) + "</b></html>");
             scheduleModel.setItems(List.of("No", "Due date", "Principal", "Interest", "Amount", "Status", "Paid at",
                     "Reference", "Days overdue"), app.loans.schedule(id), (LoanInstallment i) -> Arrays.asList(
                     i.installmentNo(), i.dueDate(), i.principalComponent(), i.interestComponent(), i.installmentAmount(),
