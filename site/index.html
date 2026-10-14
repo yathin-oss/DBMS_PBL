@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bank DBMS</title>
+<meta name="description" content="DBMS Project 55: a MySQL double-entry banking database with a Java/JDBC Swing desktop application.">
+<style>
+  :root {
+    --bg: #f7f8fa; --surface: #ffffff; --text: #16191f; --muted: #5b6472;
+    --border: #e2e5ea; --accent: #1f5fbf; --accent-soft: #e8f0fc; --code: #f0f2f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1216; --surface: #171b21; --text: #e7eaee; --muted: #9aa3af;
+      --border: #2a3039; --accent: #6ea3f0; --accent-soft: #1a2a42; --code: #1f242c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1216; --surface: #171b21; --text: #e7eaee; --muted: #9aa3af;
+    --border: #2a3039; --accent: #6ea3f0; --accent-soft: #1a2a42; --code: #1f242c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 64px 0 40px; border-bottom: 1px solid var(--border); }
+  .tag { display: inline-block; font-size: 13px; color: var(--accent); background: var(--accent-soft);
+         padding: 3px 10px; border-radius: 999px; margin-bottom: 16px; }
+  h1 { font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 12px; }
+  h2 { font-size: 22px; margin: 0 0 16px; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  p.lead { font-size: 18px; color: var(--muted); max-width: 720px; margin: 0 0 24px; }
+  .btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn.ghost { border: 1px solid var(--border); color: var(--text); background: var(--surface); }
+  section { padding: 48px 0; border-bottom: 1px solid var(--border); }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .stat b { display: block; font-size: 28px; }
+  .stat span { color: var(--muted); font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption { padding: 10px 14px; font-size: 14px; color: var(--muted); }
+  .er { background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 12px; }
+  .er img { display: block; width: 100%; height: auto; }
+  pre { background: var(--code); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
+        overflow-x: auto; font-size: 14px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .note { background: var(--accent-soft); border-radius: 8px; padding: 12px 16px; font-size: 15px; }
+  footer { padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <span class="tag">DBMS Project 55</span>
+    <h1>Bank Account and Transaction Management System</h1>
+    <p class="lead">A MySQL database and a layered Java/JDBC desktop application that simulate the core of a retail bank.
+      Every financial event is a double-entry ledger transaction, history is never edited, and the database enforces integrity itself.</p>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/yathin-oss/DBMS_PBL">View source on GitHub</a>
+      <a class="btn ghost" href="#run">Run it locally</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><b>15</b><span>tables in 3NF/BCNF</span></div>
+      <div class="stat"><b>39</b><span>CHECK constraints</span></div>
+      <div class="stat"><b>19</b><span>foreign keys</span></div>
+      <div class="stat"><b>6</b><span>triggers</span></div>
+      <div class="stat"><b>11</b><span>views</span></div>
+      <div class="stat"><b>152</b><span>JUnit tests, all passing</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Features</h2>
+    <div class="grid">
+      <div class="card"><h3>Customers, branches, products</h3><p>Create, read, update and search, with validation for email, phone, IFSC, age 18+ and masked ID numbers.</p></div>
+      <div class="card"><h3>Accounts</h3><p>Product-specific minimum deposits, joint holders, and an ACTIVE / FROZEN / BLOCKED / CLOSED lifecycle with status history.</p></div>
+      <div class="card"><h3>Money movement</h3><p>Deposits, withdrawals, atomic transfers to ACTIVE beneficiaries and service charges, all through one locking posting engine.</p></div>
+      <div class="card"><h3>Corrections</h3><p>Reversal transactions mark the original REVERSED. Nothing is ever edited or deleted.</p></div>
+      <div class="card"><h3>Loans</h3><p>Disbursement with a reducing-balance EMI schedule, and instalment repayment split into principal and interest.</p></div>
+      <div class="card"><h3>Reports</h3><p>Statements, trial balance, branch and loan summaries, and a one-click ledger integrity check of 13 invariants.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Desktop application</h2>
+    <div class="shots">
+      <figure><img src="assets/1_dashboard.png" alt="Dashboard screen" loading="lazy"><figcaption>Dashboard</figcaption></figure>
+      <figure><img src="assets/2_customers.png" alt="Customers screen" loading="lazy"><figcaption>Customers</figcaption></figure>
+      <figure><img src="assets/3_accounts.png" alt="Accounts screen" loading="lazy"><figcaption>Accounts</figcaption></figure>
+      <figure><img src="assets/4_transactions.png" alt="Transactions screen" loading="lazy"><figcaption>Transactions</figcaption></figure>
+      <figure><img src="assets/5_beneficiaries.png" alt="Beneficiaries screen" loading="lazy"><figcaption>Beneficiaries</figcaption></figure>
+      <figure><img src="assets/6_loans.png" alt="Loans screen" loading="lazy"><figcaption>Loans</figcaption></figure>
+      <figure><img src="assets/7_branches_products.png" alt="Branches and products screen" loading="lazy"><figcaption>Branches and products</figcaption></figure>
+      <figure><img src="assets/8_statements_reports.png" alt="Statements and reports screen" loading="lazy"><figcaption>Statements and reports</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>ER diagram</h2>
+    <div class="er"><img src="assets/er_diagram.svg" alt="Entity-relationship diagram of the bank database" loading="lazy"></div>
+  </div>
+</section>
+
+<section id="run">
+  <div class="wrap">
+    <h2>Run it locally</h2>
+    <p class="note">This is a desktop (Swing) application backed by a local MySQL server, so it runs on your machine rather than in the browser.
+      You need MySQL 8.0.16+, JDK 17+ and Maven 3.8+.</p>
+<pre><code>git clone https://github.com/yathin-oss/DBMS_PBL.git && cd DBMS_PBL
+
+# 1. Create the databases and app user (set a password in the file first)
+mysql -u root -p &lt; sql/00_create_database.sql
+
+# 2. Install schema, triggers, views and demo data
+scripts/setup_database.sh --with-sample-data
+
+# 3. Configure the connection, then build and run
+cp db.properties.example db.properties    # set db.password
+mvn clean package
+java -jar target/bank-dbms.jar</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Java 17 · Swing · JDBC · MySQL · Maven. Released under the MIT License.</div>
+</footer>
+</body>
+</html>

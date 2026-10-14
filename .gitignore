@@ -28,3 +28,7 @@ logs/
 *.rar
 hs_err_pid*
 replay_pid*
+
+# Vercel build output
+site/assets/
+.vercel/

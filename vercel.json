@@ -1,0 +1,6 @@
+{
+  "framework": null,
+  "buildCommand": "mkdir -p site/assets && cp docs/screenshots/*.png docs/diagrams/er_diagram.svg site/assets/",
+  "outputDirectory": "site",
+  "cleanUrls": true
+}
